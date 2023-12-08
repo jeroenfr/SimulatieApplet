@@ -56,7 +56,9 @@ def server(input, output, session):
         x = np.random.binomial(input.n(), input.p_0(), 1000)
         y = np.where(x>=drempel, "Groter of gelijk aan steekproef", "Kleiner dan steekproef")
         df = pd.DataFrame({'waarden': x, 'vlag': y})
-        sns.histplot(data = df , x = 'waarden', hue='vlag', binwidth=1, alpha=0.5, palette=['skyblue', 'salmon'])
+        plot = sns.histplot(data = df , x = 'waarden', hue='vlag', binwidth=1, alpha=0.5, palette=['skyblue', 'salmon'])
+        plot.set(title='Steekproevenverdeling', xlabel = 'Steekproefproporties', ylabel = 'Frequentie')
+        return plot
         
 
 

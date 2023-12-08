@@ -1,0 +1,12 @@
+{
+    "https://api.shinyapps.io": {
+        "server_url": "https://api.shinyapps.io",
+        "filename": "C:\\Users\\fraj\\SimulatieApplet",
+        "app_url": "https://667ij2-jeroen-f.shinyapps.io/your-app-namesimulatieapplet/",
+        "app_id": 10746018,
+        "app_guid": null,
+        "title": "SimulatieApplet",
+        "app_mode": "python-shiny",
+        "app_store_version": 1
+    }
+}
