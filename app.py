@@ -7,7 +7,7 @@ import shinyswatch
 
 app_ui = ui.page_fluid(
     # theme
-    shinyswatch.theme_picker_ui(),
+    #shinyswatch.theme_picker_ui(),
     
     
     ui.layout_sidebar(
@@ -26,7 +26,7 @@ app_ui = ui.page_fluid(
 
 
 def server(input, output, session):
-    shinyswatch.theme_picker_server()
+    shinyswatch.theme.minty()
     @reactive.Calc
     def drempelwaarde():
         return input.n()*input.p_observed()
