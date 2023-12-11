@@ -20,7 +20,7 @@ app_ui = ui.page_fluid(
         ui.panel_main(
             ui.output_plot("histogram"),
             ui.output_text("txt1"),
-            ui.output_table("data")
+            ui.output_data_frame("data")
         ),
     ),
 )
@@ -41,14 +41,14 @@ def server(input, output, session):
     #dataset = pd.DataFrame(columns = ['waarden', 'vlag'])
         
     @output
-    @render.table
+    @render.data_frame
     def data():
         drempel = input.n()*input.p_observed()
         print("Drempel is: " + str(drempel))
         x = np.random.binomial(input.n(), input.p_0(), input.n_sim())
         y = np.where(x>=drempel, 1, 0)
         df = pd.DataFrame({'waarden': x, 'vlag':y})
-        return df
+        return render.DataTable(df, row_selection_mode='multiple')
 
     @output
     @render.plot(alt="A histogram")
