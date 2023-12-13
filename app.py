@@ -4,6 +4,7 @@ import seaborn as sns
 import pandas as pd
 from shiny import App, reactive, render, ui
 import shinyswatch
+ 
 
 app_ui = ui.page_fluid(
     # theme
@@ -20,12 +21,15 @@ app_ui = ui.page_fluid(
         ui.panel_main(
             ui.row(
                 ui.column(8, ui.output_plot("histogram")),
-                ui.column(4, ui.output_text("txt1")),
+                ui.column(4,
+                     ui.output_text("txt1"),
+                     ui.output_text("empirical_p"),
+                ),
             ),
             
             ui.row(
-                ui.column(12, ui.output_data_frame("data")),
-            ),
+                ui.column(12, ui.output_data_frame("out")),
+            ),   
         ),
     ),
 )
@@ -33,6 +37,7 @@ app_ui = ui.page_fluid(
 
 def server(input, output, session):
     shinyswatch.theme.minty()
+
     @reactive.Calc
     def drempelwaarde():
         return input.n()*input.p_observed()
@@ -44,29 +49,37 @@ def server(input, output, session):
         
     #dataset = pd.DataFrame({'waarden': pd.Series(dtype = 'int'), 'vlag':pd.Series(dtype = 'int')})
     #dataset = pd.DataFrame(columns = ['waarden', 'vlag'])
-        
+
+    @reactive.Calc    
+    def dataset():
+        d = drempelwaarde()
+        x = np.random.binomial(input.n(), input.p_0(), input.n_sim())
+        y = np.where(x>=d, 1, 0)
+        df = pd.DataFrame({'waarden': x, 'vlag':y})
+        return df
+    
     @output
     @render.data_frame
-    def data():
-        drempel = input.n()*input.p_observed()
-        print("Drempel is: " + str(drempel))
-        x = np.random.binomial(input.n(), input.p_0(), input.n_sim())
-        y = np.where(x>=drempel, 1, 0)
-        df = pd.DataFrame({'waarden': x, 'vlag':y})
+    def out():
+        df = dataset()
         return render.DataTable(df, row_selection_mode='multiple')
 
+        
     @output
     @render.plot(alt="A histogram")
     def histogram():
-        drempel = input.n()*input.p_observed()
-        x = np.random.binomial(input.n(), input.p_0(), input.n_sim())
-        y = np.where(x>=drempel, "Groter of gelijk aan steekproef", "Kleiner dan steekproef")
-        df = pd.DataFrame({'waarden': x, 'vlag': y})
-        plot = sns.histplot(data = df , x = 'waarden', hue='vlag', binwidth=1, alpha=0.5, palette=['skyblue', 'salmon'])
+        drempel = drempelwaarde()
+        df = dataset()
+        plot = sns.histplot(data = df , x = 'waarden', hue='vlag', hue_order = [0,1], binwidth=1, alpha=0.5, palette=['skyblue', 'salmon'])
         plot.set(title='Steekproevenverdeling', xlabel = 'Steekproefproporties', ylabel = 'Frequentie')
         return plot
-        
 
-
+    @output
+    @render.text
+    def empirical_p():
+        drempel = input.n()*input.p_observed()
+        x = np.random.binomial(input.n(), input.p_0(), input.n_sim())
+        y = np.where(x>=drempel, 1, 0)
+        return f'Empirische p-waarde is "{round(np.mean(y), 3)}"'
     
 app = App(app_ui, server, debug=True)
