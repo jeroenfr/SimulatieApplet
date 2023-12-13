@@ -68,7 +68,6 @@ def server(input, output, session):
     @output
     @render.plot(alt="A histogram")
     def histogram():
-        drempel = drempelwaarde()
         df = dataset()
         plot = sns.histplot(data = df , x = 'waarden', hue='vlag', hue_order = [0,1], binwidth=1, alpha=0.5, palette=['skyblue', 'salmon'])
         plot.set(title='Steekproevenverdeling', xlabel = 'Steekproefproporties', ylabel = 'Frequentie')
