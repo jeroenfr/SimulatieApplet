@@ -8,7 +8,7 @@ import shinyswatch
 app_ui = ui.page_fluid(
     # theme
     #shinyswatch.theme_picker_ui(),
-    
+    ui.panel_title("Hypothesetest met proporties"),
     
     ui.layout_sidebar(
         ui.panel_sidebar(
