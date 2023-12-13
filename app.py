@@ -4,6 +4,8 @@ import seaborn as sns
 import pandas as pd
 from shiny import App, reactive, render, ui
 import shinyswatch
+import random
+from datetime import datetime 
 
 app_ui = ui.page_fluid(
     # theme
@@ -20,12 +22,15 @@ app_ui = ui.page_fluid(
         ui.panel_main(
             ui.row(
                 ui.column(8, ui.output_plot("histogram")),
-                ui.column(4, ui.output_text("txt1")),
+                ui.column(4,
+                     ui.output_text("txt1"),
+                     ui.output_text("empirical_p"),
+                ),
             ),
             
             ui.row(
                 ui.column(12, ui.output_data_frame("data")),
-            ),
+            ),   
         ),
     ),
 )
@@ -33,6 +38,7 @@ app_ui = ui.page_fluid(
 
 def server(input, output, session):
     shinyswatch.theme.minty()
+
     @reactive.Calc
     def drempelwaarde():
         return input.n()*input.p_observed()
@@ -66,7 +72,13 @@ def server(input, output, session):
         plot.set(title='Steekproevenverdeling', xlabel = 'Steekproefproporties', ylabel = 'Frequentie')
         return plot
         
-
-
+    
+    @output
+    @render.text
+    def empirical_p():
+        drempel = input.n()*input.p_observed()
+        x = np.random.binomial(input.n(), input.p_0(), input.n_sim())
+        y = np.where(x>=drempel, 1, 0)
+        return f'Empirische p-waarde is "{round(np.mean(y), 3)}"'
     
 app = App(app_ui, server, debug=True)
