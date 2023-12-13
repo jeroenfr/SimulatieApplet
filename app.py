@@ -18,9 +18,14 @@ app_ui = ui.page_fluid(
             ui.input_numeric("n_sim", "Aantal simulaties onder nulhypothese", 1000),
         ),
         ui.panel_main(
-            ui.output_plot("histogram"),
-            ui.output_text("txt1"),
-            ui.output_data_frame("data")
+            ui.row(
+                ui.column(8, ui.output_plot("histogram")),
+                ui.column(4, ui.output_text("txt1")),
+            ),
+            
+            ui.row(
+                ui.column(12, ui.output_data_frame("data")),
+            ),
         ),
     ),
 )
