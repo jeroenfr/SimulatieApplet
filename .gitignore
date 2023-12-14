@@ -5,3 +5,4 @@
 
 app.cpython-311.pyc
 .pyc
+**/__pycache__/
