@@ -1,3 +1,12 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:49530d9133281101c70a5dfb5513d42e93efe81cf306fc4c74db1b8988e3c8fa
-size 395
+{
+    "https://api.shinyapps.io": {
+        "server_url": "https://api.shinyapps.io",
+        "filename": "C:\\Users\\fraj\\SimulatieApplet",
+        "app_url": "https://667ij2-jeroen-f.shinyapps.io/your-app-namesimulatieapplet/",
+        "app_id": 10746018,
+        "app_guid": null,
+        "title": "SimulatieApplet",
+        "app_mode": "python-shiny",
+        "app_store_version": 1
+    }
+}
