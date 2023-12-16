@@ -5,11 +5,13 @@ import pandas as pd
 from shiny import App, reactive, render, ui
 import shinyswatch
  
+choices = {"a": "Eenzijdig rechts", "b": "Eenzijdig links", "c": "Tweezijdig"}
 
 app_ui = ui.page_fluid(
     # theme
     #shinyswatch.theme_picker_ui(),
     ui.panel_title("Hypothesetest met proporties"),
+    
     
     ui.layout_sidebar(
         ui.panel_sidebar(
@@ -17,6 +19,7 @@ app_ui = ui.page_fluid(
             ui.input_slider("p_observed", "Geobserveerde steekproefproportie", value=0.5, min=0, max=1),
             ui.input_slider("p_0", "Nulhypothese : p_0 = ", value=0.5, min=0, max=1),
             ui.input_numeric("n_sim", "Aantal simulaties onder nulhypothese", 1000),
+            ui.input_radio_buttons("rb1", "Type test", choices),
         ),
         ui.panel_main(
             ui.row(
@@ -50,11 +53,20 @@ def server(input, output, session):
     #dataset = pd.DataFrame({'waarden': pd.Series(dtype = 'int'), 'vlag':pd.Series(dtype = 'int')})
     #dataset = pd.DataFrame(columns = ['waarden', 'vlag'])
 
+    @reactive.Calc
+    def vlag_conditie():
+        if input.rb1() == "a":
+            return "x >= d"
+        elif input.rb1() == "b":
+            return "x <= d"
+        else:
+            return "x >= d" #TODO: dit moet nog aangepast worden voor tweezijdig
+
     @reactive.Calc    
     def dataset():
         d = drempelwaarde()
         x = np.random.binomial(input.n(), input.p_0(), input.n_sim())
-        y = np.where(x>=d, 1, 0)
+        y = np.where(eval(vlag_conditie()), 1, 0)
         df = pd.DataFrame({'waarden': x, 'vlag':y})
         return df
     
@@ -76,9 +88,8 @@ def server(input, output, session):
     @output
     @render.text
     def empirical_p():
-        drempel = input.n()*input.p_observed()
-        x = np.random.binomial(input.n(), input.p_0(), input.n_sim())
-        y = np.where(x>=drempel, 1, 0)
-        return f'Empirische p-waarde is "{round(np.mean(y), 3)}"'
+        df = dataset()
+        mean = round(df['vlag'].mean(), 3)
+        return f'Empirische p-waarde is "{mean}"'
     
 app = App(app_ui, server, debug=True)
