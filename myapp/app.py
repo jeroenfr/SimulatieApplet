@@ -43,24 +43,43 @@ def server(input, output, session):
 
     @reactive.Calc
     def drempelwaarde():
-        return input.n()*input.p_observed()
+        distance = abs(input.p_0() - input.p_observed())
+        if input.rb1() == 'a' :
+            return [input.n()*input.p_observed()]
+        elif input.rb1() == 'b':
+            return [input.n()*input.p_observed()]
+        elif input.rb1() == "c":
+            return [input.n()*(input.p_0() - distance), input.n()*(input.p_0() + distance)]
+
 
     @output
     @render.text
     def txt1():
-        return f'Drempelwaarde is "{round(drempelwaarde())}"'
+        if len(drempelwaarde()) == 2:
+            return f'Drempelwaarden zijn {np.round(drempelwaarde()[0])} en {np.round(drempelwaarde()[1])}'
+        else:
+            return f'Drempelwaarde is {np.round(drempelwaarde()[0])}'
         
-    #dataset = pd.DataFrame({'waarden': pd.Series(dtype = 'int'), 'vlag':pd.Series(dtype = 'int')})
-    #dataset = pd.DataFrame(columns = ['waarden', 'vlag'])
-
+    
     @reactive.Calc
     def vlag_conditie():
+        """
+        Returns the condition based on the selected radio button. d is treshold value in dataset and differs for 
+        left, right and two sided test. Two sided test has two thresholds.
+
+        If the radio button 'a' is selected, the condition is 'x >= d'.
+        If the radio button 'b' is selected, the condition is 'x <= d'.
+        If button c is selected, the condition is 'x <= d[0]) | (x >= d[1]' where first is lower treshold and second is upper treshold.
+
+        Returns:
+            str: The condition based on the selected radio button.
+        """
         if input.rb1() == "a":
-            return "x >= d"
+            return "x >= d[0]"
         elif input.rb1() == "b":
-            return "x <= d"
+            return "x <= d[0]"
         else:
-            return "x >= d" #TODO: dit moet nog aangepast worden voor tweezijdig
+            return "(x <= d[0]) | (x >= d[1])" #TODO: dit moet nog aangepast worden voor tweezijdig
 
     @reactive.Calc    
     def dataset():
