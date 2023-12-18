@@ -23,7 +23,10 @@ app_ui = ui.page_fluid(
         ),
         ui.panel_main(
             ui.row(
-                ui.column(8, ui.output_plot("histogram")),
+                ui.column(8, 
+                          ui.output_plot("histogram"),
+                          ui.input_switch("x2", "Verander naar proporties")
+                          ),
                 ui.column(4,
                      ui.output_text("txt1"),
                      ui.output_text("empirical_p"),
@@ -86,7 +89,8 @@ def server(input, output, session):
         d = drempelwaarde()
         x = np.random.binomial(input.n(), input.p_0(), input.n_sim())
         y = np.where(eval(vlag_conditie()), 1, 0)
-        df = pd.DataFrame({'waarden': x, 'vlag':y})
+        z = x/input.n()
+        df = pd.DataFrame({'waarden': x, 'proporties' : z, 'vlag':y})
         return df
     
     @output
@@ -95,12 +99,19 @@ def server(input, output, session):
         df = dataset()
         return render.DataTable(df, row_selection_mode='multiple')
 
-        
+    @reactive.Calc
+    def prop_view():
+        if input.x2():
+            return 'proporties'
+        else:
+            return 'waarden'
+
+
     @output
     @render.plot(alt="A histogram")
     def histogram():
         df = dataset()
-        plot = sns.histplot(data = df , x = 'waarden', hue='vlag', hue_order = [0,1], binwidth=1, alpha=0.5, palette=['skyblue', 'salmon'])
+        plot = sns.histplot(data = df , x = prop_view(), hue='vlag', hue_order = [0,1], binwidth=1, alpha=0.5, palette=['skyblue', 'salmon'])
         plot.set(title='Steekproevenverdeling', xlabel = 'Steekproefproporties', ylabel = 'Frequentie')
         return plot
 
