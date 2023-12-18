@@ -99,20 +99,18 @@ def server(input, output, session):
         df = dataset()
         return render.DataTable(df, row_selection_mode='multiple')
 
-    @reactive.Calc
-    def prop_view():
-        if input.x2():
-            return 'proporties'
-        else:
-            return 'waarden'
-
+    
 
     @output
     @render.plot(alt="A histogram")
     def histogram():
         df = dataset()
-        plot = sns.histplot(data = df , x = prop_view(), hue='vlag', hue_order = [0,1],  palette=['skyblue', 'salmon'])
-        plot.set(title='Steekproevenverdeling', xlabel = 'Steekproefproporties', ylabel = 'Frequentie')
+        if input.x2():
+            plot = sns.histplot(data = df , x = 'proporties',bins='scott', alpha=1, hue='vlag', hue_order = [0,1], palette=['skyblue', 'salmon'])
+            plot.set(title='Steekproevenverdeling', xlabel = 'Steekproefproporties', ylabel = 'Frequentie')
+        else:
+            plot = sns.histplot(data = df , x = 'waarden', hue='vlag', hue_order = [0,1], discrete=True, palette=['skyblue', 'salmon'])
+            plot.set(title='Steekproevenverdeling', xlabel = 'Aantal successen in steekproef', ylabel = 'Frequentie')
         return plot
 
     @output
