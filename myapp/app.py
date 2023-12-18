@@ -111,7 +111,7 @@ def server(input, output, session):
     @render.plot(alt="A histogram")
     def histogram():
         df = dataset()
-        plot = sns.histplot(data = df , x = prop_view(), hue='vlag', hue_order = [0,1], binwidth=1, alpha=0.5, palette=['skyblue', 'salmon'])
+        plot = sns.histplot(data = df , x = prop_view(), hue='vlag', hue_order = [0,1],  palette=['skyblue', 'salmon'])
         plot.set(title='Steekproevenverdeling', xlabel = 'Steekproefproporties', ylabel = 'Frequentie')
         return plot
 
