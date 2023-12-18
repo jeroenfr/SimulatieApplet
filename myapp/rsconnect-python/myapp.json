@@ -1,7 +1,7 @@
 {
     "https://api.shinyapps.io": {
         "server_url": "https://api.shinyapps.io",
-        "filename": "C:\\Users\\fraj\\SimulatieApplet\\myapp",
+        "filename": "/home/jeroen/SimulatieApplet/myapp",
         "app_url": "https://jeroenfrans.shinyapps.io/simulatieapplet/",
         "app_id": 10797445,
         "app_guid": null,
