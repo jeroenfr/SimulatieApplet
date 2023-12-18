@@ -8,36 +8,47 @@ import shinyswatch
 choices = {"a": "Eenzijdig rechts", "b": "Eenzijdig links", "c": "Tweezijdig"}
 
 app_ui = ui.page_fluid(
-    # theme
-    #shinyswatch.theme_picker_ui(),
-    ui.panel_title("Hypothesetest met proporties"),
+
+    ui.navset_tab_card(
+
+        ui.nav("Hypothesetest met proporties",
+                ui.panel_title("Hypothesetest met proporties"),
     
     
-    ui.layout_sidebar(
-        ui.panel_sidebar(
-            ui.input_numeric("n", "Steekproefgrootte", 40),
-            ui.input_slider("p_observed", "Geobserveerde steekproefproportie", value=0.5, min=0, max=1),
-            ui.input_slider("p_0", "Nulhypothese : p_0 = ", value=0.5, min=0, max=1),
-            ui.input_numeric("n_sim", "Aantal simulaties onder nulhypothese", 1000),
-            ui.input_radio_buttons("rb1", "Type test", choices),
-        ),
-        ui.panel_main(
-            ui.row(
-                ui.column(8, 
-                          ui.output_plot("histogram"),
-                          ui.input_switch("x2", "Verander naar proporties")
-                          ),
-                ui.column(4,
-                     ui.output_text("txt1"),
-                     ui.output_text("empirical_p"),
+                ui.layout_sidebar(
+                    ui.panel_sidebar(
+                        ui.input_numeric("n", "Steekproefgrootte", 40),
+                        ui.input_slider("p_observed", "Geobserveerde steekproefproportie", value=0.5, min=0, max=1),
+                        ui.input_slider("p_0", "Nulhypothese : p_0 = ", value=0.5, min=0, max=1),
+                        ui.input_numeric("n_sim", "Aantal simulaties onder nulhypothese", 1000),
+                        ui.input_radio_buttons("rb1", "Type test", choices),
+                        ),
+                    ui.panel_main(
+                        ui.row(
+                            ui.column(8, 
+                                ui.output_plot("histogram"),
+                                ui.input_switch("x2", "Verander naar proporties")
+                            ),
+                            ui.column(4,
+                                ui.output_text("txt1"),
+                                ui.output_text("empirical_p"),
+                            ),
+                        ),
+            
+                        ui.row(
+                            ui.column(12, ui.output_data_frame("out")),
+                        ),   
+                    ),
                 ),
             ),
-            
-            ui.row(
-                ui.column(12, ui.output_data_frame("out")),
-            ),   
-        ),
+        ui.nav("Hypothesetest met gemiddeldes",
+               ui.panel_title("Hypothesetest met gemiddeldes"),
+
+               ),
     ),
+    # theme
+    #shinyswatch.theme_picker_ui(),
+   
 )
 
 
