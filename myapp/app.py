@@ -44,7 +44,33 @@ app_ui = ui.page_fluid(
         ui.nav("Hypothesetest met gemiddeldes",
                ui.panel_title("Hypothesetest met gemiddeldes"),
 
-               ),
+                ui.layout_sidebar(
+                    ui.panel_sidebar(
+                        ui.input_numeric("n_norm", "Steekproefgrootte", 40),
+                        ui.input_numeric("mu_observed_norm", "Geobserveerde steekproefgemiddelde", 0),
+                        ui.input_numeric("sigma_observed_norm", "Geobserveerde standaardafwijking", 0),
+                        ui.input_numeric("mu_0", "Nulhypothese : mu_0 = ", 0),
+                        ui.input_numeric("n_sim_norm", "Aantal simulaties onder nulhypothese", 1000),
+                        ui.input_radio_buttons("rb2", "Type test", choices),
+                        ),
+                    ui.panel_main(
+                        ui.row(
+                            ui.column(8, 
+                                #ui.output_plot("histogram"),
+                                #ui.input_switch("x2", "Verander naar proporties")
+                            ),
+                            ui.column(4,
+                                #ui.output_text("txt1"),
+                                #ui.output_text("empirical_p"),
+                            ),
+                        ),
+            
+                        ui.row(
+                            #ui.column(12, ui.output_data_frame("out")),
+                        ),   
+                    ),
+                ),
+            ),
     ),
     # theme
     #shinyswatch.theme_picker_ui(),
@@ -56,7 +82,7 @@ def server(input, output, session):
     shinyswatch.theme.minty()
 
     @reactive.Calc
-    def drempelwaarde():
+    def drempelwaarde_prop():
         """
         Geeft de drempelwaarde terug afhankelijk van de gekozen radio button. De drempelwaarde is het aantal successen in de steekproef even extreem 
         of extremer dan de geobserveerde steekproefproportie. De drempelwaarde is afhankelijk van de gekozen radio button. 
@@ -76,14 +102,14 @@ def server(input, output, session):
     @output
     @render.text
     def txt1():
-        if len(drempelwaarde()) == 2:
-            return f'Drempelwaarden zijn {np.round(drempelwaarde()[0])} en {np.round(drempelwaarde()[1])}'
+        if len(drempelwaarde_prop()) == 2:
+            return f'Drempelwaarden zijn {np.round(drempelwaarde_prop()[0])} en {np.round(drempelwaarde_prop()[1])}'
         else:
-            return f'Drempelwaarde is {np.round(drempelwaarde()[0])}'
+            return f'Drempelwaarde is {np.round(drempelwaarde_prop()[0])}'
         
     
     @reactive.Calc
-    def vlag_conditie():
+    def vlag_proportie():
         """
         Returns the condition based on the selected radio button. d is treshold value in dataset and differs for 
         left, right and two sided test. Two sided test has two thresholds.
@@ -104,9 +130,9 @@ def server(input, output, session):
 
     @reactive.Calc    
     def dataset():
-        d = drempelwaarde()
+        d = drempelwaarde_prop()
         x = np.random.binomial(input.n(), input.p_0(), input.n_sim())
-        y = np.where(eval(vlag_conditie()), 1, 0)
+        y = np.where(eval(vlag_proportie()), 1, 0)
         z = x/input.n()
         df = pd.DataFrame({'waarden': x, 'proporties' : z, 'vlag':y})
         return df
