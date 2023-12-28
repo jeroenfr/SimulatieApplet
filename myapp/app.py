@@ -57,6 +57,13 @@ def server(input, output, session):
 
     @reactive.Calc
     def drempelwaarde():
+        """
+        Geeft de drempelwaarde terug afhankelijk van de gekozen radio button. De drempelwaarde is het aantal successen in de steekproef even extreem 
+        of extremer dan de geobserveerde steekproefproportie. De drempelwaarde is afhankelijk van de gekozen radio button. 
+        Bij een eenzijdige test is de drempelwaarde de geobserveerde steekproefproportie. Bij een tweezijdige test zijn er twee drempelwaarden: één gelijk aan de geobserveerde
+        steekproefproportie en één  symmetrisch t.o.v. de proportie onder de nulhypothese. Deze wordt berekend mbv 'distance' in de functie.
+
+       """
         distance = abs(input.p_0() - input.p_observed())
         if input.rb1() == 'a' :
             return [input.n()*input.p_observed()]
