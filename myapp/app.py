@@ -31,7 +31,7 @@ app_ui = ui.page_fluid(
                             ),
                             ui.column(4,
                                 ui.output_text("txt1"),
-                                ui.output_text("empirical_p"),
+                                ui.output_text("empirical_p_prop"),
                             ),
                         ),
             
@@ -61,7 +61,7 @@ app_ui = ui.page_fluid(
                             ),
                             ui.column(4,
                                 #ui.output_text("txt1"),
-                                #ui.output_text("empirical_p"),
+                                #ui.output_text("empirical_p_prop"),
                             ),
                         ),
             
@@ -159,7 +159,7 @@ def server(input, output, session):
 
     @output
     @render.text
-    def empirical_p():
+    def empirical_p_prop_prop():
         df = dataset_proportie()
         mean = round(df['vlag'].mean(), 3)
         return f'Empirische p-waarde is "{mean}"'
