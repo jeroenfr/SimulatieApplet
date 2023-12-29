@@ -48,7 +48,7 @@ app_ui = ui.page_fluid(
                     ui.panel_sidebar(
                         ui.input_numeric("n_norm", "Steekproefgrootte", 40),
                         ui.input_numeric("mu_observed_norm", "Geobserveerde steekproefgemiddelde", 0),
-                        ui.input_numeric("sigma_observed_norm", "Geobserveerde standaardafwijking", 0),
+                        ui.input_numeric("sigma_observed_norm", "Geobserveerde standaardafwijking", 1, min=0.00001),
                         ui.input_numeric("mu_0", "Nulhypothese : mu_0 = ", 0),
                         ui.input_numeric("n_sim_norm", "Aantal simulaties onder nulhypothese", 1000),
                         ui.input_radio_buttons("rb2", "Type test", choices),
@@ -66,7 +66,7 @@ app_ui = ui.page_fluid(
                         ),
             
                         ui.row(
-                            #ui.column(12, ui.output_data_frame("out")),
+                            ui.column(12, ui.output_data_frame("out_norm")),
                         ),   
                     ),
                 ),
@@ -98,6 +98,23 @@ def server(input, output, session):
         elif input.rb1() == "c":
             return [input.n()*(input.p_0() - distance), input.n()*(input.p_0() + distance)]
 
+    @reactive.Calc
+    def drempelwaarde_norm():
+        """
+        Geeft de drempelwaarde terug afhankelijk van de gekozen radio button. De drempelwaarde is het aantal successen in de steekproef even extreem 
+        of extremer dan de geobserveerde steekproefproportie. De drempelwaarde is afhankelijk van de gekozen radio button. 
+        Bij een eenzijdige test is de drempelwaarde de geobserveerde steekproefproportie. Bij een tweezijdige test zijn er twee drempelwaarden: één gelijk aan de geobserveerde
+        steekproefproportie en één  symmetrisch t.o.v. de proportie onder de nulhypothese. Deze wordt berekend mbv 'distance' in de functie.
+
+       """
+        distance = abs(input.mu_0() - input.mu_observed_norm())
+        if input.rb2() == 'a' :
+            return [input.mu_observed_norm()]
+        elif input.rb2() == 'b':
+            return [input.mu_observed_norm()]
+        elif input.rb2() == "c":
+            return [input.mu_0() - distance, input.mu_0() + distance]
+
 
     @output
     @render.text
@@ -126,7 +143,27 @@ def server(input, output, session):
         elif input.rb1() == "b":
             return "x <= d[0]"
         else:
-            return "(x <= d[0]) | (x >= d[1])" #TODO: dit moet nog aangepast worden voor tweezijdig
+            return "(x <= d[0]) | (x >= d[1])" 
+        
+    @reactive.Calc
+    def vlag_norm():
+        """
+        Returns the condition based on the selected radio button. d is treshold value in dataset and differs for 
+        left, right and two sided test. Two sided test has two thresholds.
+
+        If the radio button 'a' is selected, the condition is 'x >= d'.
+        If the radio button 'b' is selected, the condition is 'x <= d'.
+        If button c is selected, the condition is 'x <= d[0]) | (x >= d[1]' where first is lower treshold and second is upper treshold.
+
+        Returns:
+            str: The condition based on the selected radio button.
+        """
+        if input.rb2() == "a":
+            return "x >= d[0]"
+        elif input.rb2() == "b":
+            return "x <= d[0]"
+        else:
+            return "(x <= d[0]) | (x >= d[1])" 
 
     @reactive.Calc    
     def dataset_proportie():
@@ -137,13 +174,27 @@ def server(input, output, session):
         df = pd.DataFrame({'waarden': x, 'proporties' : z, 'vlag':y})
         return df
     
+    @reactive.Calc    
+    def dataset_norm():
+        d = drempelwaarde_norm()
+        se = input.sigma_observed_norm()/np.sqrt(input.n_norm())
+        x = np.random.normal(input.mu_0(), se, input.n_sim_norm())
+        y = np.where(eval(vlag_norm()), 1, 0)
+        df = pd.DataFrame({'Steekproefgemiddelden': x,  'vlag':y})
+        return df
+
+    
     @output
     @render.data_frame
     def out():
         df = dataset_proportie()
         return render.DataTable(df, row_selection_mode='multiple')
 
-    
+    @output
+    @render.data_frame
+    def out_norm():
+        df = dataset_norm()
+        return render.DataTable(df, row_selection_mode='multiple')
 
     @output
     @render.plot(alt="A histogram")
