@@ -26,7 +26,7 @@ app_ui = ui.page_fluid(
                     ui.panel_main(
                         ui.row(
                             ui.column(8, 
-                                ui.output_plot("histogram"),
+                                ui.output_plot("histogram_prop"),
                                 ui.input_switch("x2", "Verander naar proporties")
                             ),
                             ui.column(4,
@@ -56,7 +56,7 @@ app_ui = ui.page_fluid(
                     ui.panel_main(
                         ui.row(
                             ui.column(8, 
-                                #ui.output_plot("histogram"),
+                                ui.output_plot("histogram_norm"),
                                 #ui.input_switch("x2", "Verander naar proporties")
                             ),
                             ui.column(4,
@@ -198,7 +198,7 @@ def server(input, output, session):
 
     @output
     @render.plot(alt="A histogram")
-    def histogram():
+    def histogram_prop():
         df = dataset_proportie()
         if input.x2():
             plot = sns.histplot(data = df , x = 'proporties',bins='scott', alpha=1, hue='vlag', hue_order = [0,1], palette=['skyblue', 'salmon'])
@@ -207,6 +207,16 @@ def server(input, output, session):
             plot = sns.histplot(data = df , x = 'waarden', hue='vlag', hue_order = [0,1], discrete=True, palette=['skyblue', 'salmon'])
             plot.set(title='Steekproevenverdeling', xlabel = 'Aantal successen in steekproef', ylabel = 'Frequentie')
         return plot
+    
+    @output
+    @render.plot(alt="A histogram")
+    def histogram_norm():
+        df = dataset_norm()
+        plot = sns.histplot(data = df , x = 'Steekproefgemiddelden', hue='vlag', hue_order = [0,1], palette=['skyblue', 'salmon'])
+        plot.set(title='Steekproevenverdeling', xlabel = 'Steekproefgemiddelden van gesimuleerde steekproeven', ylabel = 'Frequentie')
+        return plot
+    
+    
 
     @output
     @render.text
