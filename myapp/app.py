@@ -129,7 +129,7 @@ def server(input, output, session):
             return "(x <= d[0]) | (x >= d[1])" #TODO: dit moet nog aangepast worden voor tweezijdig
 
     @reactive.Calc    
-    def dataset():
+    def dataset_proportie():
         d = drempelwaarde_prop()
         x = np.random.binomial(input.n(), input.p_0(), input.n_sim())
         y = np.where(eval(vlag_proportie()), 1, 0)
@@ -140,7 +140,7 @@ def server(input, output, session):
     @output
     @render.data_frame
     def out():
-        df = dataset()
+        df = dataset_proportie()
         return render.DataTable(df, row_selection_mode='multiple')
 
     
@@ -148,7 +148,7 @@ def server(input, output, session):
     @output
     @render.plot(alt="A histogram")
     def histogram():
-        df = dataset()
+        df = dataset_proportie()
         if input.x2():
             plot = sns.histplot(data = df , x = 'proporties',bins='scott', alpha=1, hue='vlag', hue_order = [0,1], palette=['skyblue', 'salmon'])
             plot.set(title='Steekproevenverdeling', xlabel = 'Steekproefproporties', ylabel = 'Frequentie')
@@ -160,7 +160,7 @@ def server(input, output, session):
     @output
     @render.text
     def empirical_p():
-        df = dataset()
+        df = dataset_proportie()
         mean = round(df['vlag'].mean(), 3)
         return f'Empirische p-waarde is "{mean}"'
     
