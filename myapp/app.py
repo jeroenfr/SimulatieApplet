@@ -220,7 +220,7 @@ def server(input, output, session):
 
     @output
     @render.text
-    def empirical_p_prop_prop():
+    def empirical_p_prop():
         df = dataset_proportie()
         mean = round(df['vlag'].mean(), 3)
         return f'Empirische p-waarde is "{mean}"'
